@@ -6,13 +6,13 @@ import Link from 'next/link'
 
 type SearchBarProps = {
   placeholder?: string
-  onBackClick?: () => void
+  backward?: string
   onSearchClick?: (keyword: string) => void
 }
 
 export default function SearchBar({
   placeholder = '좋아하는 작품/작가를 검색하세요',
-  onBackClick,
+  backward,
   onSearchClick,
 }: SearchBarProps) {
   const [keyword, setKeyword] = useState('')
@@ -34,7 +34,7 @@ export default function SearchBar({
       {/* 상단 행: 화살표 / 텍스트 / 돋보기 */}
       <div className="flex w-full items-center gap-[15px]">
         <Link
-          href={'/home'}
+          href={`/${backward}`}
           aria-label="홈으로 이동"
           className="flex h-6 w-6 items-center justify-center"
         >

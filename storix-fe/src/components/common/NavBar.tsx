@@ -25,7 +25,7 @@ const NAV_ITEMS: { key: NavKey; label: string }[] = [
 const ROUTES: Record<NavKey, string> = {
   home: '/home',
   feed: '/feed',
-  library: '#',
+  library: '/library',
   profile: '/profile',
 }
 
@@ -69,7 +69,7 @@ export default function NavBar({ active, onChange }: NavBarProps) {
   }
 
   return (
-    <div className="fixed z-50 w-full max-w-[393px] bottom-0 left-1/2 -translate-x-1/2">
+    <div className="min-[360px]:fixed max-[360px]:relative z-50 w-full max-w-[393px] bottom-0 left-1/2 -translate-x-1/2 ">
       <div className="relative w-full">
         <nav className="relative z-10 flex h-24 w-full items-start px-5 pt-[15px] pb-3">
           {/* 왼쪽 두 개: gap-4 = 16px */}
@@ -87,7 +87,7 @@ export default function NavBar({ active, onChange }: NavBarProps) {
         </nav>
         <div className="fixed w-full max-w-[393px] bottom-0 left-1/2 -translate-x-1/2">
           <Image
-            src="/common/icons/navigationbar-background.svg"
+            src="/icons/navbar/navigationbar-background.svg"
             alt="네비게이션 바 배경"
             width={393}
             height={100}
@@ -104,7 +104,7 @@ export default function NavBar({ active, onChange }: NavBarProps) {
             }}
           >
             <Image
-              src="/common/icons/plus-floating-tab.svg"
+              src="icons/navbar/plus-floating-tab.svg"
               alt="플러스 플로팅 탭"
               width={162}
               height={98}
@@ -129,7 +129,7 @@ export default function NavBar({ active, onChange }: NavBarProps) {
           aria-expanded={isPlusOpen}
         >
           <Image
-            src="/common/icons/plus.svg"
+            src="/icons/navbar/plus.svg"
             alt="플러스"
             width={56}
             height={56}

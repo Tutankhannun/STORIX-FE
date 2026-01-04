@@ -1,51 +1,20 @@
-// src/app/home/page.tsx
+// src/app/library/page.tsx
 'use client'
 
-import { useState } from 'react'
-import HomeHeader from '@/components/home/HomeHeader'
-import { CardNav } from '@/components/home/todayTopicRoom/CardNav'
-import { TopicRoomCoverSlider } from '@/components/home/todayTopicRoom/TopicRoomCoverSlider'
-import { TopicRoomData } from '@/components/home/todayTopicRoom/TopicroomCoverCard'
-import HotFeedSlider from '@/components/home/hotFeed/HotFeedSlider'
-import MyTypeCard from '@/components/home/myType/MyTypeCard'
-import HashtagList from '@/components/common/HashtagList'
+import LibraryHeader from '@/components/library/LibraryHeader'
 import NavBar from '@/components/common/NavBar'
+import MyTypeCard from '@/components/home/myType/MyTypeCard'
 
-const MOCK_ROOMS: TopicRoomData[] = [
-  {
-    id: 'room1',
-    imageUrl: '/sample/topicroom-1.webp', // 일단 public에 더미 이미지 넣어두고 쓰기
-    title: '탄서방 시어머니회',
-    subtitle: '웹툰 상수리나무 아래',
-    memberCount: 13,
-  },
-  {
-    id: 'room2',
-    imageUrl: '/sample/topicroom-1.webp',
-    title: '탄서방 시어머니회 2',
-    subtitle: '웹툰 상수리나무 아래',
-    memberCount: 20,
-  },
-  {
-    id: 'room3',
-    imageUrl: '/sample/topicroom-1.webp',
-    title: '탄서방 시어머니회 3',
-    subtitle: '웹툰 상수리나무 아래',
-    memberCount: 22,
-  },
-]
-
-const userName = '나는 유저1' // 나중에 유저 정보 받아오면 바꾸기
-
-export default function Home() {
-  const [active, setActive] = useState<'home' | 'feed' | 'library' | 'profile'>(
-    'home',
-  )
-
+export default function Library() {
   return (
     <div className="px-4">
-      <div className="w-full h-full flex flex-col pb-32"> </div>
-      <NavBar active={active} onChange={setActive} />
+      <LibraryHeader />
+      <div className="w-full h-full flex flex-col pb-32">
+        <div className="flex-1 flex flex-col gap-[24px] overflow-y-auto overflow-x-hidden">
+          <div className="w-[390px] mx-auto"> </div>
+        </div>
+      </div>
+      <NavBar active={'library'} />
     </div>
   )
 }

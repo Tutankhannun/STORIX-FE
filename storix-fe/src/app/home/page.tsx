@@ -35,8 +35,6 @@ const MOCK_ROOMS: TopicRoomData[] = [
   },
 ]
 
-const userName = '나는 유저1' // 나중에 유저 정보 받아오면 바꾸기
-
 export default function Home() {
   const [active, setActive] = useState<'home' | 'feed' | 'library' | 'profile'>(
     'home',
