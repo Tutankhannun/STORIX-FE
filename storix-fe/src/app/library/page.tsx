@@ -3,7 +3,6 @@
 
 import LibraryHeader from '@/components/library/LibraryHeader'
 import NavBar from '@/components/common/NavBar'
-import MyTypeCard from '@/components/home/myType/MyTypeCard'
 
 export default function Library() {
   return (

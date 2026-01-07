@@ -1,32 +1,54 @@
 // src/app/onboarding/components/genre.tsx
+
+// ✅ 백엔드 ENUM 값(전송용) 타입
+export type GenreKey =
+  | 'ROMANCE'
+  | 'FANTASY'
+  | 'ROFAN'
+  | 'HISTORICAL'
+  | 'DRAMA'
+  | 'THRILLER'
+  | 'ACTION'
+  | 'BL'
+  | 'MODERN_FANTASY'
+  | 'DAILY' // ✅ 라노벨용 매핑 추가
+
 interface GenreProps {
-  value: string[]
-  onChange: (value: string[]) => void
+  // ✅ value는 백엔드로 보낼 ENUM 키 배열
+  value: GenreKey[]
+  onChange: (value: GenreKey[]) => void
 }
 
-const genres = [
-  '로맨스',
-  '로판',
-  'BL',
-  '판타지',
-  '현판',
-  '무협',
-  '라노벨',
-  '드라마',
-  '미스터리',
+// ✅ UI 표시(label)와 API 전송(key)을 분리
+const GENRE_OPTIONS: Array<{ key: GenreKey; label: string }> = [
+  { key: 'ROMANCE', label: '로맨스' },
+  { key: 'ROFAN', label: '로판' },
+  { key: 'BL', label: 'BL' },
+  { key: 'FANTASY', label: '판타지' },
+  { key: 'MODERN_FANTASY', label: '현판' },
+  { key: 'HISTORICAL', label: '무협' },
+
+  // ✅ 라노벨을 화면에 보이게 하고, 백엔드에는 DAILY로 전송
+  { key: 'DAILY', label: '라노벨' },
+
+  { key: 'DRAMA', label: '드라마' },
+  { key: 'THRILLER', label: '미스터리' },
+
+  // ⚠️ ACTION이 백엔드에서 실제로 허용된다면 UI에 추가 가능
+  // { key: 'ACTION', label: '액션' },
 ]
 
 const MAX_GENRE_SELECTION = 3
 
 export default function Genre({ value, onChange }: GenreProps) {
-  const handleGenreClick = (genre: string) => {
-    if (value.includes(genre)) {
+  const handleGenreClick = (genreKey: GenreKey) => {
+    if (value.includes(genreKey)) {
       // 이미 선택된 장르 제거
-      onChange(value.filter((g) => g !== genre))
+      onChange(value.filter((g) => g !== genreKey))
     } else {
       // 최대 3개까지만 선택 가능
       if (value.length < MAX_GENRE_SELECTION) {
-        onChange([...value, genre])
+        onChange([...value, genreKey])
       }
     }
   }
@@ -66,23 +88,23 @@ export default function Genre({ value, onChange }: GenreProps) {
 
       {/* 장르 선택 그리드 */}
       <div className="mt-16 grid grid-cols-3 gap-x-4 gap-y-7">
-        {genres.map((genre) => {
-          const isSelected = value.includes(genre)
+        {GENRE_OPTIONS.map(({ key, label }) => {
+          const isSelected = value.includes(key)
           const isDisabled = !isSelected && value.length >= MAX_GENRE_SELECTION
 
           return (
             <div
-              key={genre}
+              key={key}
               className={`flex flex-col items-center transition-opacity ${
                 isDisabled
                   ? 'cursor-not-allowed opacity-30'
                   : 'cursor-pointer hover:opacity-80'
               }`}
-              onClick={() => !isDisabled && handleGenreClick(genre)}
+              onClick={() => !isDisabled && handleGenreClick(key)}
             >
               <img
                 src="/onboarding/genre-select.svg"
-                alt={genre}
+                alt={label}
                 width={80}
                 height={80}
                 className={isSelected ? 'opacity-100' : 'opacity-50'}
@@ -96,7 +118,7 @@ export default function Genre({ value, onChange }: GenreProps) {
                   lineHeight: '140%',
                 }}
               >
-                {genre}
+                {label}
               </p>
             </div>
           )

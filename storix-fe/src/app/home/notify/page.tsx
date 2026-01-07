@@ -1,7 +1,6 @@
 // src/app/home/notify/page.tsx
 
 import TopNotifyNavigation from '@/components/home/notify/TopNotifyNavigation'
-import NotifyCardProps from '@/components/home/notify/NotifyCard'
 import NotifyList from '@/components/home/notify/NotifyList'
 
 const NOTIFY_ITEMS = [

@@ -7,28 +7,28 @@ import { CardNav } from '@/components/home/todayTopicRoom/CardNav'
 import { TopicRoomCoverSlider } from '@/components/home/todayTopicRoom/TopicRoomCoverSlider'
 import { TopicRoomData } from '@/components/home/todayTopicRoom/TopicroomCoverCard'
 import HotFeedSlider from '@/components/home/hotFeed/HotFeedSlider'
-import MyTypeCard from '@/components/home/myType/MyTypeCard'
+import MyTasteCard from '@/components/home/myTaste/MyTasteCard'
 import HashtagList from '@/components/common/HashtagList'
 import NavBar from '@/components/common/NavBar'
 
 const MOCK_ROOMS: TopicRoomData[] = [
   {
     id: 'room1',
-    imageUrl: '/sample/topicroom-1.webp', // 일단 public에 더미 이미지 넣어두고 쓰기
+    imageUrl: '/image/sample/topicroom-1.webp', // 일단 public에 더미 이미지 넣어두고 쓰기
     title: '탄서방 시어머니회',
     subtitle: '웹툰 상수리나무 아래',
     memberCount: 13,
   },
   {
     id: 'room2',
-    imageUrl: '/sample/topicroom-1.webp',
+    imageUrl: '/image/sample/topicroom-1.webp',
     title: '탄서방 시어머니회 2',
     subtitle: '웹툰 상수리나무 아래',
     memberCount: 20,
   },
   {
     id: 'room3',
-    imageUrl: '/sample/topicroom-1.webp',
+    imageUrl: '/image/sample/topicroom-1.webp',
     title: '탄서방 시어머니회 3',
     subtitle: '웹툰 상수리나무 아래',
     memberCount: 22,
@@ -53,7 +53,7 @@ export default function Home() {
 
           <div className="flex flex-col w-full">
             <CardNav header="이 작품, 내 취향일까?" roomName="#" />
-            <MyTypeCard />
+            <MyTasteCard />
           </div>
 
           <div className="flex flex-col w-full">

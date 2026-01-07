@@ -129,13 +129,14 @@ body {
   /*------ iPhone16 Container ------*/
   .ipone16-container,
   .iphone16-container {
-    aspect-ratio: 393 / 852;
     width: min(100%, 393px);
-    height: max(100%, 852px);
-    border: 1px solid;
     background-color: var(--color-white);
-    border-color: var(--color-gray-200);
     overflow: hidden;
+  }
+
+  .iphone16-container > .flex-1 > * {
+    min-height: 100%;
+    width: 100%;
   }
 
   /* 스크롤은 되지만 스크롤바는 안 보이게 하는 공용 클래스 */

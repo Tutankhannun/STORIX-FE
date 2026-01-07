@@ -1,23 +1,77 @@
+// src/app/login/page.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Splash } from '@/app/splash'
+import { getKakaoAuthUrl } from '@/api/auth/kakao.api'
+
+function generateNaverState() {
+  // ✅ 요구사항: state는 랜덤 문자열
+  // (검증/비교 로직은 명세에 없으니 추가하지 않음)
+  if (typeof window !== 'undefined' && window.crypto?.getRandomValues) {
+    const bytes = new Uint8Array(16)
+    window.crypto.getRandomValues(bytes)
+    return Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+  }
+
+  // fallback
+  return `${Date.now()}_${Math.random().toString(16).slice(2)}`
+}
 
 export default function LoginPage() {
+  console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL)
+
   const [showSplash, setShowSplash] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSplash(false)
-    }, 1500)
-
+    const timer = setTimeout(() => setShowSplash(false), 1500)
     return () => clearTimeout(timer)
   }, [])
 
-  // ✅ Gmail 앱 우선(모바일) → Gmail 웹 → mailto fallback
+  // 카카오 로그인 버튼 클릭 (인가 코드 요청 → redirect_uri(/pending)로 돌아옴)
+  const handleKakaoLogin = async () => {
+    try {
+      const authUrl = await getKakaoAuthUrl()
+      window.location.href = authUrl
+    } catch {
+      alert('로그인 준비에 실패했습니다.')
+    }
+  }
+
+  // 네이버 로그인 버튼 클릭 (Authorize로 이동)
+  const handleNaverLogin = () => {
+    const clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID
+    const redirectUri = process.env.NEXT_PUBLIC_NAVER_REDIRECT_URI
+
+    if (!clientId) {
+      console.error('NEXT_PUBLIC_NAVER_CLIENT_ID is not set')
+      alert('네이버 로그인 설정이 누락되었습니다. (CLIENT_ID)')
+      return
+    }
+    if (!redirectUri) {
+      console.error('NEXT_PUBLIC_NAVER_REDIRECT_URI is not set')
+      alert('네이버 로그인 설정이 누락되었습니다. (REDIRECT_URI)')
+      return
+    }
+
+    const state = generateNaverState()
+
+    const authUrl =
+      `https://nid.naver.com/oauth2.0/authorize` +
+      `?response_type=code` +
+      `&client_id=${clientId}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&state=${encodeURIComponent(state)}`
+
+    window.location.href = authUrl
+  }
+
+  // ✅ 작가 문의: Gmail 앱 우선(모바일) → Gmail 웹
   const handleAuthorInquiry = () => {
     const toRaw = 'storixbiz@gmail.com'
     const subjectRaw = 'STORIX 작가 문의'
@@ -29,51 +83,33 @@ export default function LoginPage() {
     const body = encodeURIComponent(bodyRaw)
 
     const gmailWebUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`
-    const mailtoUrl = `mailto:${toRaw}?subject=${subject}&body=${body}`
-
     const ua = navigator.userAgent || ''
     const isIOS = /iPhone|iPad|iPod/i.test(ua)
     const isAndroid = /Android/i.test(ua)
 
-    // iOS: Gmail 앱 딥링크 시도 → 실패 시 Gmail 웹
     if (isIOS) {
       const gmailAppUrl = `googlegmail:///co?to=${to}&subject=${subject}&body=${body}`
       window.location.href = gmailAppUrl
-
       setTimeout(() => {
         window.location.href = gmailWebUrl
       }, 700)
-
       return
     }
 
-    // Android: intent로 Gmail 앱 시도 → 실패 시 Gmail 웹
     if (isAndroid) {
       const gmailIntentUrl = `intent://co?to=${to}&subject=${subject}&body=${body}#Intent;scheme=googlegmail;package=com.google.android.gm;end`
       window.location.href = gmailIntentUrl
-
       setTimeout(() => {
         window.location.href = gmailWebUrl
       }, 700)
-
       return
     }
 
-    // Desktop: Gmail 웹 새 탭 시도 (팝업 차단이면 현재 탭으로 이동)
     const opened = window.open(gmailWebUrl, '_blank')
-    if (!opened) {
-      window.location.href = gmailWebUrl
-    }
-
-    // (선택) 그래도 안 되면 mailto를 쓰고 싶다면 아래를 켜도 됨
-    // setTimeout(() => {
-    //   window.location.href = mailtoUrl
-    // }, 1200)
+    if (!opened) window.location.href = gmailWebUrl
   }
 
-  if (showSplash) {
-    return <Splash />
-  }
+  if (showSplash) return <Splash />
 
   return (
     <div className="relative w-full h-full flex flex-col items-center">
@@ -83,7 +119,7 @@ export default function LoginPage() {
           className="text-[16px] font-medium leading-[140%] transition-opacity hover:opacity-70"
           style={{ color: 'var(--color-gray-500)' }}
           onClick={() => {
-            // TODO: 추후 경로 설정
+            router.push('/home/demo')
           }}
         >
           둘러보기
@@ -109,6 +145,7 @@ export default function LoginPage() {
             width={360}
             height={48}
             className="cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={handleKakaoLogin}
           />
         </div>
 
@@ -119,10 +156,10 @@ export default function LoginPage() {
             width={360}
             height={48}
             className="cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={handleNaverLogin}
           />
         </div>
 
-        {/* ✅ 작가 문의 */}
         <p
           className="caption-1 text-gray-500 text-center underline cursor-pointer mt-4 hover:opacity-70"
           onClick={handleAuthorInquiry}

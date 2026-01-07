@@ -14,7 +14,7 @@ export default function Topbar({ onBack }: TopbarProps) {
     <div className="w-full h-14 p-4 flex justify-end items-center bg-white">
       {/* 건너뛰기 */}
       <button
-        onClick={() => router.push('/')}
+        onClick={() => router.push('/home')}
         className="text-center cursor-pointer hover:opacity-70 transition-opacity whitespace-nowrap shrink-0"
         style={{
           width: '56px',

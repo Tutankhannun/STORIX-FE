@@ -1,8 +1,23 @@
-// src/app/profile/components/genre.tsx
 'use client'
 
-export default function Genre() {
-  const genres = [
+type GenreKey =
+  | '로맨스'
+  | '판타지'
+  | 'BL'
+  | '로판'
+  | '라노벨'
+  | '드라마'
+  | '현판'
+  | '무협'
+  | '미스터리'
+
+type Props = {
+  // 0~100
+  genreData?: Partial<Record<GenreKey, number>>
+}
+
+export default function Genre({ genreData }: Props) {
+  const genres: GenreKey[] = [
     '로맨스',
     '판타지',
     'BL',
@@ -14,8 +29,8 @@ export default function Genre() {
     '미스터리',
   ]
 
-  // TODO: API 연동 후 실제 데이터로 대체
-  const genreData: { [key: string]: number } = {
+  // ✅ API 없으면 기본값(테스트용) 유지
+  const fallback: Record<GenreKey, number> = {
     로맨스: 90,
     로판: 70,
     BL: 30,
@@ -25,6 +40,11 @@ export default function Genre() {
     라노벨: 28,
     드라마: 35,
     미스터리: 10,
+  }
+
+  const merged: Record<GenreKey, number> = {
+    ...fallback,
+    ...(genreData || {}),
   }
 
   const centerX = 116.5
@@ -51,7 +71,7 @@ export default function Genre() {
 
   const getDataPath = () => {
     const points = genres.map((genre, i) => {
-      const value = genreData[genre] || 0
+      const value = merged[genre] ?? 0
       const radius = (value / 100) * maxRadius
       return getPoint(i, radius)
     })
@@ -66,7 +86,6 @@ export default function Genre() {
         backgroundColor: 'var(--color-white)',
       }}
     >
-      {/* 제목 */}
       <h2
         className="text-[18px] font-semibold leading-[140%]"
         style={{ color: 'var(--color-gray-900)' }}
@@ -74,11 +93,9 @@ export default function Genre() {
         선호 장르
       </h2>
 
-      {/* 레이더 차트 */}
       <div className="mt-6 flex justify-center">
         <div style={{ width: '233px', height: '255px' }}>
           <svg width="233" height="255" viewBox="0 0 233 255">
-            {/* 배경 정구각형들 */}
             {levels.map((radius, i) => (
               <path
                 key={i}
@@ -89,10 +106,8 @@ export default function Genre() {
               />
             ))}
 
-            {/* 데이터 영역 - magenta-200 */}
             <path d={getDataPath()} fill="#FF80B3" fillOpacity="0.5" />
 
-            {/* 바깥 구각형 꼭지점 포인트 - magenta-300 */}
             {genres.map((_, i) => {
               const point = getPoint(i, maxRadius)
               return (
@@ -107,7 +122,6 @@ export default function Genre() {
               )
             })}
 
-            {/* 장르 라벨 */}
             {genres.map((genre, i) => {
               const pos = getPoint(i, labelRadius)
               return (

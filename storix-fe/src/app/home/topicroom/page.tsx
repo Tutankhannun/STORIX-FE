@@ -10,7 +10,7 @@ const userName = '스토릭스' // 나중에 유저 정보 받아오면 바꾸�
 const MOCK_LIST = [
   {
     id: 1,
-    thumbnail: '/sample/topicroom-1.jpg',
+    thumbnail: '/image/sample/topicroom-1.webp',
     title: '이착헌이 누구야?',
     subtitle: '웹소설 <이세계 착한 헌터>',
     memberCount: 13,
@@ -18,7 +18,7 @@ const MOCK_LIST = [
   },
   {
     id: 2,
-    thumbnail: '/sample/topicroom-1.jpg',
+    thumbnail: '/image/sample/topicroom-1.webp',
     title: '이착헌이 누구야?',
     subtitle: '웹소설 <이세계 착한 헌터>',
     memberCount: 13,
@@ -26,7 +26,7 @@ const MOCK_LIST = [
   },
   {
     id: 3,
-    thumbnail: '/sample/topicroom-1.jpg',
+    thumbnail: '/image/sample/topicroom-1.webp',
     title: '이착헌이 누구야?',
     subtitle: '웹소설 <이세계 착한 헌터>',
     memberCount: 13,
@@ -34,7 +34,7 @@ const MOCK_LIST = [
   },
   {
     id: 4,
-    thumbnail: '/sample/topicroom-1.jpg',
+    thumbnail: '/image/sample/topicroom-1.webp',
     title: '이착헌이 누구야?',
     subtitle: '웹소설 <이세계 착한 헌터>',
     memberCount: 13,
@@ -42,7 +42,7 @@ const MOCK_LIST = [
   },
   {
     id: 5,
-    thumbnail: '/sample/topicroom-1.jpg',
+    thumbnail: '/image/sample/topicroom-1.webp',
     title: '이착헌이 누구야?',
     subtitle: '웹소설 <이세계 착한 헌터>',
     memberCount: 13,
@@ -52,35 +52,35 @@ const MOCK_LIST = [
 const MOCK_ROOMS: TopicRoomData[] = [
   {
     id: 'room1',
-    imageUrl: '/sample/topicroom-1.jpg', // 일단 public에 더미 이미지 넣어두고 쓰기
+    imageUrl: '/image/sample/topicroom-1.webp', // 일단 public에 더미 이미지 넣어두고 쓰기
     title: '탄서방 시어머니회',
     subtitle: '웹툰 상수리나무 아래',
     memberCount: 13,
   },
   {
     id: 'room2',
-    imageUrl: '/sample/topicroom-1.jpg',
+    imageUrl: '/image/sample/topicroom-1.webp',
     title: '탄서방 시어머니회 2',
     subtitle: '웹툰 상수리나무 아래',
     memberCount: 20,
   },
   {
     id: 'room3',
-    imageUrl: '/sample/topicroom-1.jpg',
+    imageUrl: '/image/sample/topicroom-1.webp',
     title: '탄서방 시어머니회 3',
     subtitle: '웹툰 상수리나무 아래',
     memberCount: 22,
   },
   {
     id: 'room4',
-    imageUrl: '/sample/topicroom-1.jpg',
+    imageUrl: '/image/sample/topicroom-1.webp',
     title: '탄서방 시어머니회 4',
     subtitle: '웹툰 상수리나무 아래',
     memberCount: 20,
   },
   {
     id: 'room5',
-    imageUrl: '/sample/topicroom-1.jpg',
+    imageUrl: '/image/sample/topicroom-1.webp',
     title: '탄서방 시어머니회 5',
     subtitle: '웹툰 상수리나무 아래',
     memberCount: 22,

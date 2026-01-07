@@ -4,17 +4,37 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuthStore } from '@/store/auth.store'
 
 export default function AgreementPage() {
-  const [agreement1, setAgreement1] = useState(false)
-  const [agreement2, setAgreement2] = useState(false)
+  const router = useRouter()
+  const { setMarketingAgree } = useAuthStore()
 
-  const allAgreed = agreement1 && agreement2
+  const [agreement1, setAgreement1] = useState(false) // 서비스 이용약관
+  const [agreement2, setAgreement2] = useState(false) // 개인정보 수집·이용
+  const [agreement3, setAgreement3] = useState(false) // 14세 이상
+
+  const allAgreed = agreement1 && agreement2 && agreement3
 
   const handleAllAgree = () => {
     const newValue = !allAgreed
     setAgreement1(newValue)
     setAgreement2(newValue)
+    setAgreement3(newValue)
+  }
+
+  const handleNext = () => {
+    if (!allAgreed) return
+
+    // ✅ "다음"을 눌렀다는 건 필수 약관 전체 동의 완료라는 의미
+    // ✅ 따라서 marketingAgree도 true로 세팅 (termsAgreed와 동일하게 사용)
+    setMarketingAgree(true)
+
+    console.log('[agreement] termsAgreed:', true, 'marketingAgree:', true)
+
+    // 온보딩 페이지로 이동
+    router.push('/onboarding')
   }
 
   const link1Class = agreement1
@@ -24,6 +44,10 @@ export default function AgreementPage() {
   const link2Class = agreement2
     ? 'ml-[6px] text-[14px] font-medium leading-[140%] underline text-[#FF4093]'
     : 'ml-[6px] text-[14px] font-medium leading-[140%] underline text-[#888787]'
+
+  const link3Class = agreement3
+    ? 'ml-[6px] text-[14px] font-medium leading-[140%] text-[#FF4093]'
+    : 'ml-[6px] text-[14px] font-medium leading-[140%]  text-[#888787]'
 
   return (
     <div className="relative h-full flex flex-col">
@@ -58,7 +82,7 @@ export default function AgreementPage() {
         </div>
 
         <div className="mt-8">
-          <button onClick={handleAllAgree} className="w-full">
+          <button onClick={handleAllAgree} className="w-full" type="button">
             <Image
               src={
                 allAgreed ? '/login/terms-pink.svg' : '/login/terms-gray.svg'
@@ -72,8 +96,10 @@ export default function AgreementPage() {
         </div>
 
         <div className="mt-5">
+          {/* 서비스 이용약관 */}
           <div className="flex items-center px-3 py-4 h-[52px]">
             <button
+              type="button"
               onClick={() => setAgreement1(!agreement1)}
               className="flex-shrink-0"
             >
@@ -97,8 +123,10 @@ export default function AgreementPage() {
             </a>
           </div>
 
+          {/* 개인정보 수집·이용 */}
           <div className="flex items-center px-3 py-4 h-[52px]">
             <button
+              type="button"
               onClick={() => setAgreement2(!agreement2)}
               className="flex-shrink-0"
             >
@@ -121,13 +149,34 @@ export default function AgreementPage() {
               (필수) 개인정보 수집·이용 동의
             </a>
           </div>
+
+          {/* 14세 이상 */}
+          <div className="flex items-center px-3 py-4 h-[52px]">
+            <button
+              type="button"
+              onClick={() => setAgreement3(!agreement3)}
+              className="flex-shrink-0"
+            >
+              <Image
+                src={
+                  agreement3 ? '/icons/check-pink.svg' : '/icons/check-gray.svg'
+                }
+                alt="체크"
+                width={20}
+                height={20}
+              />
+            </button>
+
+            <span className={link3Class}>(필수) 14세 이상입니다</span>
+          </div>
         </div>
       </div>
 
       <div className="h-[84px] flex items-center justify-center px-4">
         {allAgreed ? (
-          <Link
-            href="/onboarding"
+          <button
+            type="button"
+            onClick={handleNext}
             className="w-full transition-opacity hover:opacity-90"
           >
             <Image
@@ -137,7 +186,7 @@ export default function AgreementPage() {
               height={50}
               className="w-full"
             />
-          </Link>
+          </button>
         ) : (
           <Image
             src="/onboarding/next-gray.svg"

@@ -193,12 +193,14 @@ export default function MyPosts() {
 
           {/* 본문 */}
           <div className="mt-3 px-4">
-            <p
-              className="text-[14px] font-medium leading-[140%] line-clamp-3"
-              style={{ color: 'var(--color-gray-800)' }}
-            >
-              {post.content}
-            </p>
+            <div className="relative">
+              <p
+                className="text-[14px] font-medium leading-[140%] line-clamp-3 pr-10"
+                style={{ color: 'var(--color-gray-800)' }}
+              >
+                {post.content}
+              </p>
+            </div>
           </div>
 
           {/* 반응 영역 */}

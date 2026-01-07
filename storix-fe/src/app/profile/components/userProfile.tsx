@@ -4,21 +4,27 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-export default function UserProfile() {
-  // TODO: API 연동 후 실제 데이터로 대체
-  const profileImage = '/profile/profile-default.svg'
-  const level = 1
-  const nickname = '닉네임'
-  const bio = '무협이 최고야 짜릿해 언제나 즐거워'
+type Props = {
+  profileImage?: string
+  level: number
+  nickname: string
+  bio: string
+}
+
+export default function UserProfile({
+  profileImage,
+  level,
+  nickname,
+  bio,
+}: Props) {
+  const fallbackImage = '/profile/profile-default.svg'
 
   return (
     <div className="relative flex items-start px-5 py-7">
-      {/* 왼쪽: 프로필 이미지 + 유저 정보 */}
       <div className="flex items-start gap-5">
-        {/* 프로필 이미지 */}
         <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
           <Image
-            src={profileImage}
+            src={profileImage || fallbackImage}
             alt="프로필 이미지"
             width={80}
             height={80}
@@ -26,9 +32,7 @@ export default function UserProfile() {
           />
         </div>
 
-        {/* 유저 정보 */}
         <div className="flex flex-col items-start">
-          {/* 레벨 */}
           <div
             className="px-2 py-1 rounded-[50px] text-[10px] font-extrabold leading-[140%] tracking-[0.2px]"
             style={{
@@ -39,7 +43,6 @@ export default function UserProfile() {
             Lv.{level}
           </div>
 
-          {/* 닉네임 */}
           <p
             className="mt-[7px] text-[18px] font-semibold leading-[140%]"
             style={{ color: 'var(--color-gray-900)' }}
@@ -47,7 +50,6 @@ export default function UserProfile() {
             {nickname}
           </p>
 
-          {/* 한줄소개 */}
           <p
             className="mt-[7px] text-[14px] font-medium leading-[140%]"
             style={{ color: 'var(--color-gray-600)' }}
@@ -57,7 +59,6 @@ export default function UserProfile() {
         </div>
       </div>
 
-      {/* 오른쪽: 프로필 수정 화살표 - 닉네임 높이에 맞춤 */}
       <Link
         href="/profile/fix"
         className="absolute right-5 transition-opacity hover:opacity-70"
