@@ -10,13 +10,12 @@ import Nickname from './components/nickname'
 import Gender from './components/gender'
 import Genre from './components/genre'
 import type { GenreKey } from './components/genre'
-
 import Favorite from './components/favorite'
 import Final from './components/final'
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const { marketingAgree, onboardingToken } = useAuthStore()
+  const { marketingAgree } = useAuthStore()
   const { mutate: signupMutate, isPending } = useSignup()
 
   const [step, setStep] = useState(1)
@@ -28,28 +27,18 @@ export default function OnboardingPage() {
   // ✅ 1단계(닉네임)에서만 쓰는 "다음으로" 활성화 상태
   const [canGoNextNickname, setCanGoNextNickname] = useState(false)
 
-  // 각 단계별 유효성 검사
-  // 각 단계별 유효성 검사
   const isStepValid = () => {
     switch (step) {
       case 1:
-        // 닉네임 중복 체크 통과
         return canGoNextNickname
-
       case 2:
         return gender !== ''
-
       case 3:
-        // 장르 1개 이상
         return genres.length >= 1
-
       case 4:
-        // ✅ 좋아하는 작품 2~18개 선택 시만 다음 활성화
         return favoriteIds.length >= 2 && favoriteIds.length <= 18
-
       case 5:
         return true
-
       default:
         return false
     }
@@ -59,12 +48,8 @@ export default function OnboardingPage() {
 
   const handleNext = () => {
     if (!canProceed) return
-
-    if (step < 5) {
-      setStep(step + 1)
-    } else {
-      handleSignup()
-    }
+    if (step < 5) setStep((s) => s + 1)
+    else handleSignup()
   }
 
   const handleSignup = () => {
@@ -87,11 +72,8 @@ export default function OnboardingPage() {
   }
 
   const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1)
-    } else {
-      router.push('/agreement')
-    }
+    if (step > 1) setStep((s) => s - 1)
+    else router.push('/agreement')
   }
 
   if (isPending) {
@@ -105,15 +87,15 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="relative w-full h-full bg-white">
-      {/* Topbar */}
-      <div className="absolute top-[54px] left-0 right-0 z-50">
+    <div className="relative w-full min-h-screen bg-white">
+      {/* ✅ Topbar: absolute 제거 → 레이아웃 흐름에 포함 */}
+      <div className="sticky top-0 z-50 bg-white">
         <Topbar onBack={handleBack} />
       </div>
 
-      {/* Progress Indicator */}
+      {/* ✅ Progress: absolute 제거 → Topbar 아래로 자연스럽게 내려옴 */}
       {step <= 4 && (
-        <div className="absolute top-[110px] left-4 z-40">
+        <div className="px-4 pt-4">
           <img
             src={`/onboarding/progress-indicater-${step}.svg`}
             alt={`진행도 ${step}/4`}
@@ -123,14 +105,8 @@ export default function OnboardingPage() {
         </div>
       )}
 
-      {/* 컨텐츠 영역 */}
-      <div
-        className="px-4 h-full overflow-y-auto"
-        style={{
-          paddingTop: step <= 4 ? '150px' : '110px',
-          paddingBottom: '134px',
-        }}
-      >
+      {/* ✅ 컨텐츠 영역: 위쪽 큰 padding 제거(전체가 같이 위로 올라감) */}
+      <div className="px-4" style={{ paddingTop: 24, paddingBottom: 134 }}>
         {step === 1 && (
           <Nickname
             value={nickname}
@@ -146,8 +122,8 @@ export default function OnboardingPage() {
         {step === 5 && <Final />}
       </div>
 
-      {/* 하단 다음 버튼 */}
-      <div className="absolute bottom-[34px] left-1/2 -translate-x-1/2 w-[361px] z-50">
+      {/* ✅ 하단 다음 버튼: 기존 유지 */}
+      <div className="fixed bottom-[34px] left-1/2 -translate-x-1/2 w-[361px] z-50">
         <img
           src={
             canProceed ? '/onboarding/next.svg' : '/onboarding/next-gray.svg'

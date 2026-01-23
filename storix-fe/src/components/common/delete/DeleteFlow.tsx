@@ -2,6 +2,8 @@
 'use client'
 
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 export type DeleteFlowProps<T> = {
   isDeleteOpen: boolean
@@ -26,7 +28,10 @@ export default function DeleteFlow<T>({
   onCloseDone,
   doneBottom = 88,
 }: DeleteFlowProps<T>) {
-  return (
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
+  const ui = (
     <>
       {/* ✅ 삭제 모달 */}
       {isDeleteOpen && deleteTarget && (
@@ -57,7 +62,7 @@ export default function DeleteFlow<T>({
               </p>
             </div>
 
-            {/* ✅ 텍스트 ↔ 버튼 간격 32px 고정 */}
+            {/* ✅ 텍스트 ↔ 버튼 간격 28px */}
             <div className="w-full px-6 flex gap-2" style={{ marginTop: 28 }}>
               <button
                 type="button"
@@ -119,4 +124,7 @@ export default function DeleteFlow<T>({
       )}
     </>
   )
+
+  if (!mounted) return null
+  return createPortal(ui, document.body)
 }

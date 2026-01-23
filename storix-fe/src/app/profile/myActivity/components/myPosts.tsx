@@ -26,6 +26,19 @@ const deleteBoard = async (boardId: number) => {
   return res.data
 }
 
+/**
+ * ✅ 좋아요 토글 API
+ * 여기 엔드포인트가 프로젝트에 이미 있으면 그걸 쓰면 되고,
+ * 없으면 "어떤 API로 좋아요 토글하는지" 알려줘야 정확히 연결 가능.
+ *
+ * 아래는 예시 (네 프로젝트에서 쓰는 경로로 바꿔야 할 수 있음)
+ */
+const toggleBoardLike = async (boardId: number) => {
+  // 예: POST /api/v1/feed/reader/board/{boardId}/like
+  const res = await apiClient.post(`/api/v1/feed/reader/board/${boardId}/like`)
+  return res.data
+}
+
 export default function MyPosts() {
   const router = useRouter()
 
@@ -45,6 +58,9 @@ export default function MyPosts() {
   const [isLast, setIsLast] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [initLoading, setInitLoading] = useState(true)
+
+  // ✅ 좋아요 토글 중(연타 방지)
+  const [likePending, setLikePending] = useState<Record<number, boolean>>({})
 
   const loadFirst = useCallback(async () => {
     setInitLoading(true)
@@ -84,17 +100,90 @@ export default function MyPosts() {
     loadFirst()
   }, [loadFirst])
 
-  // ✅ useInfiniteScroll 훅 시그니처에 맞게 수정 (enabled/onIntersect 제거)
   useInfiniteScroll({
     root: scrollRef,
     target: sentinelRef,
-    hasNextPage: !isLast, // 다음 페이지 있냐
-    isLoading: isLoading, // 로딩 중이냐
-    onLoadMore: loadMore, // 더 불러오기
+    hasNextPage: !isLast,
+    isLoading: isLoading,
+    onLoadMore: loadMore,
     rootMargin: '200px',
   })
 
-  // ✅ 삭제 플로우 (MyComments랑 동일)
+  // ✅ 좋아요 토글 핸들러 (낙관적 업데이트 + 실패 롤백)
+  const handleToggleLike = useCallback(
+    async (boardId: number) => {
+      if (likePending[boardId]) return
+
+      const current = items.find((x) => x.board.boardId === boardId)
+      if (!current) return
+
+      const prevLiked = current.board.isLiked
+      const prevCount = current.board.likeCount
+
+      // 1) UI 먼저 바꿈(optimistic)
+      setLikePending((m) => ({ ...m, [boardId]: true }))
+      setItems((prev) =>
+        prev.map((x) => {
+          if (x.board.boardId !== boardId) return x
+          const nextLiked = !x.board.isLiked
+          const nextCount = Math.max(
+            0,
+            x.board.likeCount + (nextLiked ? 1 : -1),
+          )
+          return {
+            ...x,
+            board: {
+              ...x.board,
+              isLiked: nextLiked,
+              likeCount: nextCount,
+            },
+          }
+        }),
+      )
+
+      try {
+        const data = await toggleBoardLike(boardId)
+
+        // ✅ 백엔드가 200 + isSuccess:false 방어
+        if (data?.isSuccess === false) {
+          throw new Error(data?.message ?? '좋아요 처리에 실패했어요.')
+        }
+
+        // (선택) 서버가 최신 likeCount/isLiked를 내려주면 여기서 동기화 가능
+        // 예: data.result에 { isLiked, likeCount } 가 있다면 반영
+        // const result = data?.result
+        // if (result && typeof result.isLiked === 'boolean' && typeof result.likeCount === 'number') {
+        //   setItems(prev => prev.map(x => x.board.boardId === boardId
+        //     ? { ...x, board: { ...x.board, isLiked: result.isLiked, likeCount: result.likeCount } }
+        //     : x
+        //   ))
+        // }
+      } catch (e) {
+        // 2) 실패하면 롤백
+        setItems((prev) =>
+          prev.map((x) => {
+            if (x.board.boardId !== boardId) return x
+            return {
+              ...x,
+              board: {
+                ...x.board,
+                isLiked: prevLiked,
+                likeCount: prevCount,
+              },
+            }
+          }),
+        )
+      } finally {
+        setLikePending((m) => {
+          const { [boardId]: _, ...rest } = m
+          return rest
+        })
+      }
+    },
+    [items, likePending],
+  )
+
+  // ✅ 삭제 플로우
   const {
     isDeleteOpen,
     deleteTarget,
@@ -108,15 +197,11 @@ export default function MyPosts() {
       const boardId = target.board.boardId
       const data = await deleteBoard(boardId)
 
-      // ✅ 백엔드가 200 + isSuccess:false 로 실패를 줄 수도 있어서 방어
       if (data?.isSuccess === false) {
         throw new Error(data?.message ?? '삭제에 실패했어요.')
       }
 
-      // ✅ UI 목록에서 제거
       setItems((prev) => prev.filter((x) => x.board.boardId !== boardId))
-
-      // ✅ 메뉴 닫기
       menu.close()
     },
     doneDurationMs: 1500,
@@ -182,11 +267,8 @@ export default function MyPosts() {
               likeCount={item.board.likeCount}
               replyCount={item.board.replyCount}
               onClickDetail={() => router.push(`/feed/article/${boardId}`)}
-              onToggleLike={() => {
-                // (내 활동 글 목록에서 좋아요 토글 필요하면 여기 API 연결)
-              }}
+              onToggleLike={() => handleToggleLike(boardId)} // ✅ 여기만 연결하면 됨
               onOpenReport={() => {
-                // 내 글 목록이므로 사실 report는 안 뜨는 게 일반적
                 menu.close()
               }}
               onOpenDelete={() => {
@@ -201,7 +283,6 @@ export default function MyPosts() {
           )
         })}
 
-        {/* ✅ sentinel */}
         <div ref={sentinelRef} style={{ height: 1 }} />
 
         {isLoading && (
@@ -211,7 +292,6 @@ export default function MyPosts() {
         )}
       </div>
 
-      {/* ✅ 삭제 모달/토스트 (MyComments와 동일) */}
       <DeleteFlow<ActivityBoardItem>
         isDeleteOpen={isDeleteOpen}
         deleteTarget={deleteTarget}

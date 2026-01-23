@@ -1,7 +1,7 @@
 // src/app/onboarding/components/favorite.tsx
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   getOnboardingWorks,
   type OnboardingWork,
@@ -51,18 +51,20 @@ export default function Favorite({ value, onChange }: FavoriteProps) {
   }
 
   const count = value.length
-  const isUnderMin = count < MIN_SELECT
-  const isAtMax = count >= MAX_SELECT
+  const hasPickedAny = count > 0
 
-  const gridItems = loading
-    ? Array.from({ length: 20 }).map((_, i) => ({
+  const gridItems = useMemo(() => {
+    if (loading) {
+      return Array.from({ length: 20 }).map((_, i) => ({
         worksId: -1 * (i + 1),
         worksName: '',
         thumbnailUrl: '',
         artistName: '',
         __loading: true as const,
       }))
-    : works.map((w) => ({ ...w, __loading: false as const }))
+    }
+    return works.map((w) => ({ ...w, __loading: false as const }))
+  }, [loading, works])
 
   return (
     <div>
@@ -70,23 +72,29 @@ export default function Favorite({ value, onChange }: FavoriteProps) {
         좋아하는 작품을 선택하세요
       </h1>
 
-      <p className="body-1 mt-[5px]" style={{ color: 'var(--color-gray-500)' }}>
-        좋아하는 작품을 기반으로 피드를 구성해드려요
-      </p>
+      {/* ✅ 0개일 땐 두 줄만 / 1개 이상이면 문구+카운트로 변경 */}
+      {!hasPickedAny ? (
+        <p
+          className="body-1 mt-[5px]"
+          style={{ color: 'var(--color-gray-500)' }}
+        >
+          좋아하는 작품을 기반으로 피드를 구성해드려요 !
+        </p>
+      ) : (
+        <div className="mt-[5px] flex items-center">
+          <p className="body-1" style={{ color: 'var(--color-gray-500)' }}>
+            최소 {MIN_SELECT}개~최대 {MAX_SELECT}개 선택가능
+          </p>
+          <span
+            className="body-1 ml-1"
+            style={{ color: 'var(--magenta-300-main, #FF4093)' }}
+          >
+            ({count}/{MAX_SELECT})
+          </span>
+        </div>
+      )}
 
-      <p
-        className="body-2 mt-[5px]"
-        style={{
-          color: isUnderMin ? 'var(--color-warning)' : 'var(--color-gray-500)',
-        }}
-      >
-        {MIN_SELECT}~{MAX_SELECT}개 선택해주세요{' '}
-        <span style={{ color: 'var(--color-gray-400)' }}>
-          (현재 {count}개 선택됨{isAtMax ? ', 최대 선택' : ''})
-        </span>
-      </p>
-
-      <div className="mt-16 grid grid-cols-3 gap-4 max-h-[500px] overflow-y-auto pb-20">
+      <div className="mt-16 grid grid-cols-3 gap-4 pb-20">
         {gridItems.map((item) => {
           const id = item.worksId
           const selected = value.includes(id)
@@ -110,22 +118,11 @@ export default function Favorite({ value, onChange }: FavoriteProps) {
                 }
               }}
             >
-              {/* ✅ 선택 배경/보더는 “전체 카드”에 적용 (기본 테두리 제거) */}
-              <div
-                className="w-full h-full rounded-[8px] overflow-hidden"
-                style={
-                  selected
-                    ? {
-                        borderRadius: 8,
-                        border: '2px solid var(--color-magenta-300)',
-                        backgroundColor: 'rgba(255, 64, 147, 0.30)',
-                      }
-                    : { borderRadius: 8 }
-                }
-              >
+              {/* ✅ 카드 외곽은 그대로, '선택 효과'는 표지(이미지) 영역에만 */}
+              <div className="w-full h-full rounded-[8px] overflow-hidden">
                 {/* 표지 */}
                 <div
-                  className="relative w-[108px] h-[144px] flex items-center gap-[10px] rounded-[8px]"
+                  className="relative w-[108px] h-[144px] rounded-[8px]"
                   style={{
                     backgroundColor: 'var(--color-gray-100)',
                     backgroundImage:
@@ -135,8 +132,19 @@ export default function Favorite({ value, onChange }: FavoriteProps) {
                     backgroundPosition: '50% 50%',
                     backgroundSize: 'cover',
                     backgroundRepeat: 'no-repeat',
+                    border: selected
+                      ? '2px solid var(--color-magenta-300)'
+                      : '2px solid transparent',
                   }}
                 >
+                  {/* ✅ 선택 핑크 필터(썸네일이 위에 깔려도 무조건 보이게 오버레이로) */}
+                  {selected && (
+                    <div
+                      className="absolute inset-0 rounded-[8px]"
+                      style={{ backgroundColor: 'rgba(255, 64, 147, 0.30)' }}
+                    />
+                  )}
+
                   {/* ✅ 체크 아이콘: 표지 내 좌상단 (8,8), 24x24 */}
                   {selected && (
                     <img
@@ -148,7 +156,7 @@ export default function Favorite({ value, onChange }: FavoriteProps) {
                   )}
                 </div>
 
-                {/* 텍스트 영역 (좌우 4px 패딩, 제목+작가 하나의 영역 느낌) */}
+                {/* 텍스트 영역 */}
                 <div className="px-1">
                   <p
                     className="body-2 mt-2"

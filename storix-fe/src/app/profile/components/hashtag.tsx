@@ -1,13 +1,32 @@
-// src/app/profile/components/hashtag.tsx
+'use client'
+
+import { useEffect, useState } from 'react'
+import { getPreferredHashtags } from '@/api/profile/readerHashtags.api'
+
 export default function Hashtag() {
-  // ✅ 나중에 API 연동 시 빈 문자열이면 자리만 남고 텍스트는 안 보임
-  const ranks = {
-    1: '#혜린아보드그만타',
-    2: '#유진이바보메롱',
-    3: '#나는공주야',
-    4: '#못생긴거보면죽는병',
-    5: '#남자는말라야아름답다',
-  }
+  const [ranks, setRanks] = useState<Record<number, string>>({})
+
+  useEffect(() => {
+    const fetchHashtags = async () => {
+      try {
+        const data = await getPreferredHashtags()
+
+        // ✅ 키워드 앞에 # 붙이기
+        const withSharp = Object.fromEntries(
+          Object.entries(data).map(([rank, keyword]) => [
+            Number(rank),
+            keyword ? `#${keyword}` : '',
+          ]),
+        )
+
+        setRanks(withSharp)
+      } catch (e) {
+        console.error('선호 해시태그 조회 실패', e)
+      }
+    }
+
+    fetchHashtags()
+  }, [])
 
   return (
     <div className="px-4 py-8">
@@ -15,7 +34,6 @@ export default function Hashtag() {
         선호 해시태그
       </h2>
 
-      {/* ✅ 배경색 제거 (영역은 유지) */}
       <div className="mt-[56px] w-full h-[178px] relative">
         {/* 4위 */}
         <p

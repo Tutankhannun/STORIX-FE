@@ -40,6 +40,10 @@ export type FeedBoardItem = {
     content: string
     likeCount: number
     replyCount: number
+
+    // ✅ NEW: 스포일러 여부 (피드/works 피드 응답에 존재)
+    isSpoiler?: boolean
+
     isLiked: boolean
   }
   images: FeedBoardImage[]

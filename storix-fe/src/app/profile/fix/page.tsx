@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Nickname from '@/app/onboarding/components/nickname'
+import Nickname from './components/nickname'
 import Bio from './components/bio'
 import {
   updateProfileNickname,
@@ -22,8 +22,8 @@ export default function ProfileFixPage() {
   const router = useRouter()
 
   const [nickname, setNickname] = useState('')
-  const [nicknameOk, setNicknameOk] = useState(false)
   const [initialNickname, setInitialNickname] = useState('')
+  const [nicknameVerified, setNicknameVerified] = useState(false) // ✅ 중복확인(검증) 완료 여부
 
   const [bioText, setBioText] = useState('')
   const [initialBioText, setInitialBioText] = useState('')
@@ -41,10 +41,14 @@ export default function ProfileFixPage() {
   const [isUploadingImage, setIsUploadingImage] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
+  // ✅ 입력이 자꾸 지워지는 것 방지: me로 초기값 세팅은 1회만
+  const initedRef = useRef(false)
+
   useEffect(() => {
     if (!me) return
+    if (initedRef.current) return
+    initedRef.current = true
 
-    // 1️⃣ 서버 기준 값
     const nextNickname = me.nickName ?? ''
     const nextBio = me.profileDescription ?? ''
     const nextProfileImageUrl = me.profileImageUrl ?? undefined
@@ -57,14 +61,14 @@ export default function ProfileFixPage() {
 
     setInitialProfileImageUrl(nextProfileImageUrl)
 
-    // 프로필 수정 화면 진입 시에는 서버 값이 "현재 값"이므로
-    // previewUrl은 비워두고, Image src는 me.profileImageUrl을 쓰게 둔다.
     setPreviewUrl(undefined)
     setSelectedImageFile(null)
 
-    // 2️⃣ sessionStorage도 동기화 (기존 컴포넌트 호환용)
+    // ✅ 초기 진입 시에는 “기존 닉네임”도 검증 안 된 상태로 시작
+    // (중복확인 눌러야 완료 활성화)
+    setNicknameVerified(false)
+
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem('signup_nickname', nextNickname)
       sessionStorage.setItem('profile_bio', nextBio)
     }
   }, [me])
@@ -92,16 +96,26 @@ export default function ProfileFixPage() {
 
   const nicknameChanged = nickname !== initialNickname
   const bioChanged = bioText !== initialBioText
-  const imageChanged = !!selectedImageFile // ✅ 파일을 선택하면 변경된 것으로 본다
+  const imageChanged = !!selectedImageFile
 
+  // ✅ 완료 버튼: 기본 비활성화
+  // ✅ 닉네임은 "중복확인(검증) 완료" 되어야만 완료 활성화
+  // ✅ 닉네임이 빈칸/조건 불만족이면 Nickname 컴포넌트가 verified를 true로 올려주지 못함
   const isEnabled = useMemo(() => {
-    // ✅ 이미지 변경도 완료 버튼 활성화 조건에 포함
-    // 닉네임 변경이 있다면 nicknameOk를 만족해야 함
-    if (nicknameChanged) return nicknameOk
-    if (bioChanged) return true
-    if (imageChanged) return true
-    return false
-  }, [nicknameChanged, nicknameOk, bioChanged, imageChanged])
+    // 닉네임이 빈칸이면 무조건 비활성화
+    if (!nickname.trim()) return false
+
+    // ✅ 닉네임 중복확인(검증)을 눌러서 OK여야 함
+    if (!nicknameVerified) {
+      // 단, 닉네임 말고 bio/이미지만 바꾼 경우엔 완료 가능하게 하고 싶다면 주석 해제:
+      // if (bioChanged || imageChanged) return true
+      return false
+    }
+
+    // 여기까지 왔다는 건 "닉네임 검증 완료" 상태
+    // 닉네임이든 bio든 이미지든 뭐든 저장 가능
+    return nicknameChanged || bioChanged || imageChanged
+  }, [nickname, nicknameVerified, nicknameChanged, bioChanged, imageChanged])
 
   const [isPressed, setIsPressed] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -118,7 +132,6 @@ export default function ProfileFixPage() {
     return null
   }
 
-  // ✅ "선택하면 저장"이 아니라, 선택 시에는 미리보기+파일만 저장
   const handleSelectProfileImage = (file: File) => {
     const contentType = toContentType(file)
     if (!contentType) {
@@ -126,16 +139,13 @@ export default function ProfileFixPage() {
       return
     }
 
-    // 미리보기 갱신
     if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl)
     const nextPreview = URL.createObjectURL(file)
     setPreviewUrl(nextPreview)
 
-    // 완료 버튼 눌렀을 때 업로드할 파일로 보관
     setSelectedImageFile(file)
   }
 
-  // ✅ 완료 버튼에서 실행될 실제 업로드 + 서버 반영
   const uploadAndApplyProfileImage = async (file: File) => {
     const contentType = toContentType(file)
     if (!contentType) {
@@ -144,7 +154,6 @@ export default function ProfileFixPage() {
 
     setIsUploadingImage(true)
     try {
-      // 1) presignedPutUrl 발급
       const presignRes = await createProfileImagePresignedPutUrl(contentType)
       if (!presignRes.isSuccess) {
         throw new Error(presignRes.message || 'Presigned URL 발급 실패')
@@ -152,12 +161,9 @@ export default function ProfileFixPage() {
 
       const { url: presignedPutUrl, objectKey } = presignRes.result
 
-      // 2) S3 PUT 업로드 (Authorization ❌)
       const putRes = await fetch(presignedPutUrl, {
         method: 'PUT',
-        headers: {
-          'Content-Type': contentType,
-        },
+        headers: { 'Content-Type': contentType },
         body: file,
       })
 
@@ -166,16 +172,11 @@ export default function ProfileFixPage() {
         throw new Error(`이미지 업로드 실패: ${putRes.status} ${t}`)
       }
 
-      // 3) 프로필 이미지 변경 API로 objectKey 저장
       const applyRes = await updateProfileImage(objectKey)
       if (!applyRes.isSuccess) {
         throw new Error(applyRes.message || '프로필 이미지 변경 실패')
       }
 
-      // ✅ 서버가 반환하는 "실제 조회용 URL"이 따로 없으면
-      // store에는 기존 url을 유지하거나(다음 /me에서 갱신),
-      // 혹은 previewUrl을 임시로 넣어 즉시 반영할 수도 있음.
-      // 여기서는 "즉시 반영"을 원하면 아래처럼 previewUrl을 넣어도 돼.
       patchMe({ profileImageUrl: me?.profileImageUrl || undefined })
       return { objectKey }
     } finally {
@@ -205,15 +206,12 @@ export default function ProfileFixPage() {
         patchMe({ profileDescription: bioText })
       }
 
-      // 3) 프로필 이미지 변경 (✅ 완료 버튼에서만 저장)
+      // 3) 프로필 이미지 변경
       if (selectedImageFile) {
         await uploadAndApplyProfileImage(selectedImageFile)
 
-        // 업로드 성공하면 "현재 상태"로 확정
         setSelectedImageFile(null)
         setInitialProfileImageUrl(me?.profileImageUrl ?? undefined)
-        // previewUrl은 미리보기라 유지해도 되고, 비워도 됨.
-        // 유지하면 즉시 화면에는 계속 새 이미지가 보임.
       }
 
       window.alert('프로필 수정 완료')
@@ -223,8 +221,6 @@ export default function ProfileFixPage() {
       window.alert(e?.message ?? '프로필 수정 중 오류가 발생했어요.')
       setIsPressed(false)
 
-      // ✅ 이미지 업로드 실패 시: 미리보기/선택을 되돌리는 게 자연스러움
-      // (원하면 주석 해제)
       if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl)
       setPreviewUrl(undefined)
       setSelectedImageFile(null)
@@ -234,9 +230,6 @@ export default function ProfileFixPage() {
     }
   }
 
-  // ✅ 화면에 보여줄 이미지 src:
-  // - 선택한 미리보기(blob)가 있으면 그걸 우선
-  // - 없으면 서버에서 내려온 프로필 이미지
   const currentProfileImage =
     previewUrl || (me?.profileImageUrl ? me.profileImageUrl : undefined)
 
@@ -278,7 +271,6 @@ export default function ProfileFixPage() {
       {/* ✅ 프로필 이미지 영역 (100x100 + 테두리) */}
       <div className="mt-8 flex justify-center">
         <div className="relative h-[100px] w-[100px]">
-          {/* 테두리 상자 */}
           <div className="h-[100px] w-[100px] overflow-hidden rounded-full border border-[var(--color-gray-200)] bg-white">
             <Image
               src={currentProfileImage || '/profile/profile-default.svg'}
@@ -289,7 +281,6 @@ export default function ProfileFixPage() {
             />
           </div>
 
-          {/* ✅ 오른쪽/아래에 32x32 change 아이콘 겹치기 */}
           <button
             type="button"
             onClick={openFilePicker}
@@ -306,7 +297,6 @@ export default function ProfileFixPage() {
             />
           </button>
 
-          {/* 숨겨진 file input */}
           <input
             ref={fileInputRef}
             type="file"
@@ -320,7 +310,6 @@ export default function ProfileFixPage() {
             }}
           />
 
-          {/* 업로딩 표시 */}
           {isUploadingImage && (
             <div className="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/30">
               <span className="text-[12px] font-medium text-white">
@@ -349,12 +338,11 @@ export default function ProfileFixPage() {
           onChange={(v) => {
             if (isPressed) setIsPressed(false)
             setNickname(v)
-            if (typeof window !== 'undefined') {
-              sessionStorage.setItem('signup_nickname', v)
-            }
+            setNicknameVerified(false) // ✅ 입력 바꾸면 다시 중복확인 필요
           }}
-          onAvailabilityChange={setNicknameOk}
           variant="inline"
+          currentNickname={initialNickname}
+          onVerifiedChange={setNicknameVerified}
         />
 
         <div className="mt-10">

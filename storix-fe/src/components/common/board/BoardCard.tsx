@@ -10,6 +10,7 @@ import { useDeleteFlow } from '@/hooks/useDeleteFlow'
 import ReportFlow from '@/components/common/report/ReportFlow'
 import DeleteFlow from '@/components/common/delete/DeleteFlow'
 import { useProfileStore } from '@/store/profile.store'
+import type { ReportConfirmOutcome } from '@/hooks/useReportFlow'
 
 const FALLBACK_PROFILE = '/profile/profile-default.svg'
 
@@ -52,7 +53,10 @@ type Props = {
   onReportConfirm?: (args: {
     boardId: number
     reportedUserId: number
-  }) => Promise<void> | void
+  }) => Promise<ReportConfirmOutcome> | ReportConfirmOutcome
+
+  // ✅ 좋아요 토글(하트 클릭)
+  onToggleLike?: (boardId: number) => void | Promise<void>
 
   onDeleteConfirm?: (args: { boardId: number }) => Promise<void> | void
 }
@@ -64,6 +68,7 @@ export default function BoardCard({
   worksTo = '/feed',
   onReportConfirm,
   onDeleteConfirm,
+  onToggleLike,
 }: Props) {
   const router = useRouter()
   const { boardId } = data
@@ -82,12 +87,15 @@ export default function BoardCard({
     nickname: string
   }>({
     onConfirm: async (t) => {
-      await onReportConfirm?.({
+      // ✅ 결과를 그대로 넘겨야 duplicated 토스트가 뜸
+      return await onReportConfirm?.({
         boardId: t.boardId,
         reportedUserId: t.reportedUserId,
       })
     },
     doneDurationMs: 5000,
+    toastDurationMs: 1500,
+    duplicatedMessage: '이미 신고한 게시글입니다.',
   })
 
   const del = useDeleteFlow<{
@@ -356,16 +364,28 @@ export default function BoardCard({
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center">
-            <Image
-              src={
-                data.board.isLiked
-                  ? '/icons/icon-like-pink.svg'
-                  : '/icons/icon-like.svg'
-              }
-              alt="좋아요"
-              width={24}
-              height={24}
-            />
+            <button
+              type="button"
+              className="inline-flex items-center cursor-pointer transition-opacity hover:opacity-80"
+              aria-label="좋아요"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation() // ✅ 카드 클릭(상세 이동) 방지
+                onToggleLike?.(boardId) // ✅ 외부 핸들러 호출
+              }}
+            >
+              <Image
+                src={
+                  data.board.isLiked
+                    ? '/icons/icon-like-pink.svg'
+                    : '/icons/icon-like.svg'
+                }
+                alt="좋아요"
+                width={24}
+                height={24}
+              />
+            </button>
+
             {data.board.likeCount > 0 && (
               <span
                 className="ml-1 text-[14px] font-bold leading-[140%]"
@@ -409,6 +429,9 @@ export default function BoardCard({
         onCloseDone={report.closeReportDone}
         getProfileImage={(t) => t.profileImage}
         getNickname={(t) => t.nickname}
+        toastOpen={report.toastOpen}
+        toastMessage={report.toastMessage}
+        onCloseToast={report.closeToast}
       />
 
       <DeleteFlow<{

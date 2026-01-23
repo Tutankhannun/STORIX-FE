@@ -29,8 +29,19 @@ const nextConfig: NextConfig = {
         hostname: 'shared-comic.pstatic.net',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'comicthumb-phinf.pstatic.net',
+        pathname: '/**',
+      },
 
-      // ✅ 추가: S3 프로필 이미지 호스트 허용
+      // ✅ 추가: 리디 표지 CDN
+      {
+        protocol: 'https',
+        hostname: 'img.ridicdn.net',
+        pathname: '/**',
+      },
+
       {
         protocol: 'https',
         hostname:

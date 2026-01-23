@@ -80,6 +80,7 @@ export default function FeedList({
             createdAt={post.createdAt}
             content={post.content}
             images={post.images ?? []}
+            isSpoiler={post.isSpoiler}
             works={
               hasWorks
                 ? {
