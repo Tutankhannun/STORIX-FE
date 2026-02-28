@@ -66,7 +66,9 @@ const nextConfig: NextConfig = {
 
   images: {
     // dev에서는 S3 upstream timeout 때문에 next/image 최적화 끄기
-    unoptimized: true,
+    unoptimized:
+      process.env.NEXT_PUBLIC_IMAGE_UNOPTIMIZED === 'true' ||
+      process.env.NODE_ENV === 'development',
 
     remotePatterns: [
       {
