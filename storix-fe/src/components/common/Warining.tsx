@@ -1,7 +1,6 @@
 // src/components/common/Warining.tsx
 'use client'
 
-import Image from 'next/image'
 
 type WarningProps = {
   title: string
@@ -22,13 +21,7 @@ export default function Warning({
     <div
       className={`flex w-full flex-col items-center justify-center gap-3 mt-48 px-4 ${className}`}
     >
-      <Image
-        src="/common/icons/warningLarge.svg"
-        alt="경고"
-        width={120}
-        height={120}
-        priority
-      />
+      <img src="/common/icons/warningLarge.svg" alt="??" width="120" height="120" loading="lazy" />
 
       <div className="flex flex-col items-center mt-2.5 gap-1">
         <p className="heading-2 text-black text-center whitespace-pre-line">

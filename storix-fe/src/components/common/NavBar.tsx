@@ -1,6 +1,5 @@
 // src/components/common/NavBar.tsx
 'use client'
-import Image from 'next/image'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ReviewWriteBottomSheet from '@/components/home/bottomsheet/ReviewWriteBottomSheet'
@@ -98,12 +97,7 @@ export default function NavBar({ active, onChange }: NavBarProps) {
           </nav>
 
           <div className="absolute inset-x-0 bottom-0 h-[80px]">
-            <Image
-              src="/common/icons/navbar/navigationbar-background.svg"
-              alt="네비게이션 바 배경"
-              width={393}
-              height={80}
-            />
+            <img src="/common/icons/navbar/navigationbar-background.svg" alt="?????? ??" width="393" height="80" loading="lazy" />
           </div>
 
           {/* 플로팅 탭 */}
@@ -126,12 +120,7 @@ export default function NavBar({ active, onChange }: NavBarProps) {
                   className="flex w-full items-center justify-between px-4 py-3 border-b border-gray-200 hover:opacity-70 cursor-pointer"
                 >
                   <span className="body-1 text-gray-800">리뷰 작성</span>
-                  <Image
-                    src="/common/icons/navbar/review.svg"
-                    alt="리뷰 작성"
-                    width={28}
-                    height={28}
-                  />
+                  <img src="/common/icons/navbar/review.svg" alt="?? ??" width="28" height="28" loading="lazy" />
                 </button>
 
                 <button
@@ -143,12 +132,7 @@ export default function NavBar({ active, onChange }: NavBarProps) {
                   className="flex w-full items-center justify-between px-4 py-3 hover:opacity-70 cursor-pointer"
                 >
                   <span className="body-1 text-gray-800">피드 작성</span>
-                  <Image
-                    src="/common/icons/navbar/feed.svg"
-                    alt="피드 작성"
-                    width={28}
-                    height={28}
-                  />
+                  <img src="/common/icons/navbar/feed.svg" alt="?? ??" width="28" height="28" loading="lazy" />
                 </button>
               </div>
             </div>
@@ -170,14 +154,7 @@ export default function NavBar({ active, onChange }: NavBarProps) {
             aria-label="추가"
             aria-expanded={isPlusOpen}
           >
-            <Image
-              src="/common/icons/navbar/plus.svg"
-              alt="플러스"
-              width={56}
-              height={56}
-              className="h-[56px] w-[56px]"
-              priority
-            />
+            <img src="/common/icons/navbar/plus.svg" alt="???" width="56" height="56" className="h-[56px] w-[56px]" loading="lazy" />
           </button>
         </div>
       </div>
