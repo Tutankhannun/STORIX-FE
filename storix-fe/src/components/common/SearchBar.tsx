@@ -1,7 +1,6 @@
 // src/components/common/SearchBar.tsx
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useState, KeyboardEvent } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -59,7 +58,7 @@ export default function SearchBar({
           onClick={() => router.push(href)}
           className="h-6 w-6 cursor-pointer"
         >
-          <Image src="/icons/back.svg" alt="뒤로가기" width={24} height={24} />
+          <img src="/icons/back.svg" alt="Back" width="24" height="24" />
         </button>
 
         <div className="flex flex-col w-full">
@@ -75,17 +74,11 @@ export default function SearchBar({
               />
               <button
                 type="button"
-                aria-label="검색"
+                aria-label="Search"
                 onClick={handleSearchClick}
                 className="flex h-6 w-6 items-center justify-center cursor-pointer"
               >
-                <Image
-                  src={'/common/icons/search.svg'}
-                  alt={'검색'}
-                  width={24}
-                  height={24}
-                  className="inline-block"
-                />
+                <img src="/common/icons/search.svg" alt="Search" width="24" height="24" className="inline-block" loading="lazy" />
               </button>
             </div>
           </div>

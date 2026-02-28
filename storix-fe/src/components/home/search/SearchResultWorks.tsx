@@ -30,7 +30,7 @@ export default function SearchResultWorks({
     <section className="flex w-full flex-col gap-3">
       {works.length > 0 ? (
         <div className="flex flex-col">
-          {works.map((w) => (
+          {works.map((w, idx) => (
             <button
               key={w.worksId}
               type="button"
@@ -45,6 +45,9 @@ export default function SearchResultWorks({
                     alt={w.worksName}
                     fill
                     sizes="87px"
+                    priority={idx < 2}
+                    loading={idx < 2 ? 'eager' : 'lazy'}
+                    decoding="async"
                     className="object-cover"
                   />
                 ) : null}
@@ -62,13 +65,7 @@ export default function SearchResultWorks({
 
                 <div className="flex items-center gap-2">
                   <span className="caption-1 text-[var(--color-magenta-300)]">
-                    <Image
-                      src="/search/littleStar.svg"
-                      alt="star icon"
-                      width={9}
-                      height={10}
-                      className="inline-block mr-1 mb-0.5"
-                    />
+                    <img src="/search/littleStar.svg" alt="star icon" width="9" height="10" className="inline-block mr-1 mb-0.5" loading="lazy" />
                     {Number(w.avgRating).toFixed(1)}
                   </span>
                 </div>

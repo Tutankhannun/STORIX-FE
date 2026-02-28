@@ -1,7 +1,6 @@
 // src/components/home/search/TrendingSearch.tsx
 'use client'
 
-import Image from 'next/image'
 import { useMemo } from 'react'
 import { useTrendingKeywords } from '@/hooks/search/useSearch'
 
@@ -61,18 +60,20 @@ export default function TrendingSearch({ onSelect, className = '' }: Props) {
 
         <div className="flex items-center justify-end w-5">
           {isUp ? (
-            <Image
+            <img
               src="/search/trendingUp.svg"
               alt="상승"
-              width={16}
-              height={16}
+              width="16"
+              height="16"
+              loading="lazy"
             />
           ) : isDown ? (
-            <Image
+            <img
               src="/search/trendingDown.svg"
               alt="하락"
-              width={16}
-              height={16}
+              width="16"
+              height="16"
+              loading="lazy"
             />
           ) : (
             // 변동 없음이면 자리만 유지

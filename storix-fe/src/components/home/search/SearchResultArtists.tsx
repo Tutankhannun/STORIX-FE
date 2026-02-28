@@ -22,7 +22,7 @@ export default function SearchResultArtists({
     <section className="flex w-full flex-col gap-3">
       {artists.length > 0 ? (
         <div className="flex flex-col">
-          {artists.map((a) => (
+          {artists.map((a, idx) => (
             <div
               key={a.artistId}
               className="flex items-center gap-3 border-b border-gray-100 py-4"
@@ -35,6 +35,9 @@ export default function SearchResultArtists({
                     fill
                     className="object-cover"
                     sizes="48px"
+                    priority={idx < 2}
+                    loading={idx < 2 ? 'eager' : 'lazy'}
+                    decoding="async"
                   />
                 ) : null}
               </div>
