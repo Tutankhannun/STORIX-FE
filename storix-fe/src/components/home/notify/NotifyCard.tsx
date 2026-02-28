@@ -1,7 +1,6 @@
 // src/components/home/notify/NotifyCard.tsx
 'use client'
 
-import Image from 'next/image'
 
 export interface NotifyCardProps {
   title: string // [이벤트] 당신의 최애캐를 소개하세요!(~3/10)
@@ -22,13 +21,7 @@ export default function NotifyCard({
       <div className="flex items-start gap-4 rounded-2xl bg-white px-4 py-4 border-bottom">
         {/* 왼쪽 동그란 썸네일 */}
         <div className="mt-1 h-6 w-6 flex-shrink-0 overflow-hidden rounded-full">
-          <Image
-            src="/common/icons/notification-gray.svg"
-            alt="STORIX"
-            width={24}
-            height={24}
-            priority
-          />
+          <img src="/common/icons/notification-gray.svg" alt="STORIX" width="24" height="24" loading="lazy" />
         </div>
 
         {/* 오른쪽 텍스트 영역 */}

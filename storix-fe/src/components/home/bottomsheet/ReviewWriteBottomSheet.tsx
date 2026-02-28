@@ -128,12 +128,7 @@ export default function ReviewWriteBottomSheet({
         <div className="flex items-center justify-between py-7">
           <span className="heading-2">작품선택</span>
           <button onClick={handleClose} className="cursor-pointer">
-            <Image
-              src="/common/icons/cancel.svg"
-              alt="닫기"
-              width={20}
-              height={20}
-            />
+            <img src="/common/icons/cancel.svg" alt="??" width="20" height="20" loading="lazy" />
           </button>
         </div>
 
@@ -145,13 +140,7 @@ export default function ReviewWriteBottomSheet({
             onChange={(e) => setKeyword(e.target.value)}
             className="w-full rounded-xl border border-gray-200 px-4 py-3 text-body-2"
           />
-          <Image
-            src="/common/icons/search.svg"
-            alt="검색"
-            width={20}
-            height={20}
-            className="absolute right-4 top-1/2 -translate-y-1/2"
-          />
+          <img src="/common/icons/search.svg" alt="??" width="20" height="20" className="absolute right-4 top-1/2 -translate-y-1/2" loading="lazy" />
         </div>
 
         <div className="flex flex-col gap-3 overflow-y-auto flex-1">

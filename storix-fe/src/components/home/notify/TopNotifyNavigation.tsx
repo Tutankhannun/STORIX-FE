@@ -1,7 +1,6 @@
 // src/components/home/notify/TopNotifyNavigation.tsx
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 
 export default function TopNotifyNavigation() {
@@ -13,7 +12,7 @@ export default function TopNotifyNavigation() {
         aria-label="홈으로 이동"
         className="flex h-6 w-6 items-center justify-center"
       >
-        <Image src="/icons/back.svg" alt="뒤로가기" width={24} height={24} />
+        <img src="/icons/back.svg" alt="????" width="24" height="24" loading="lazy" />
       </Link>
       <div className="flex w-full h-full justify-center items-center -translate-x-1.5">
         <p className="body-1 font-gray-900">알림</p>
