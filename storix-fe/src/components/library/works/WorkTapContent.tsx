@@ -219,14 +219,7 @@ export default function WorkTabContent({
             // onClick={onReviewWrite}
             className="flex py-1.5 px-1.5 items-center justify-center gap-1 rounded-xl bg-[var(--color-magenta-50)] cursor-pointer"
           >
-            <Image
-              src="/icons/icon-share.svg"
-              alt="share"
-              width={32}
-              height={32}
-              className="inline-block"
-              priority
-            />
+            <img src="/icons/icon-share.svg" alt="share" width="32" height="32" className="inline-block" loading="lazy" />
           </button>
 
           <button
@@ -235,14 +228,7 @@ export default function WorkTabContent({
             disabled={isCheckingRoom}
             className="flex flex-1 items-center justify-center rounded-xl bg-[var(--color-magenta-300)] text-white body-2 disabled:opacity-50 cursor-pointer"
           >
-            <Image
-              src="/common/icons/fire.svg"
-              alt="fire"
-              width={24}
-              height={24}
-              className="inline-block mb-0.5"
-              priority
-            />
+            <img src="/common/icons/fire.svg" alt="fire" width="24" height="24" className="inline-block mb-0.5" loading="lazy" />
             {isCheckingRoom ? '확인 중...' : '토픽룸 입장'}
           </button>
         </div>

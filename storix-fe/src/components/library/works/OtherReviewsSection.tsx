@@ -70,13 +70,7 @@ export default function OtherReviewsSection({
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <Image
-                      src={'/common/icons/reviewProfile.svg'}
-                      alt={r.userName ?? 'profile'}
-                      width={32}
-                      height={32}
-                      className="h-full w-full object-cover"
-                    />
+                    <img src="/common/icons/reviewProfile.svg" alt={r.userName ?? "profile"} width="32" height="32" className="h-full w-full object-cover" loading="lazy" />
                   )}
                 </div>
 

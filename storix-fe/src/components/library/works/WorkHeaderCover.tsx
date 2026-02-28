@@ -1,7 +1,6 @@
 //src/components/library/works/WorkHeaderCover.tsx
 'use client'
 
-import Image from 'next/image'
 
 type UIData = {
   id: number
@@ -16,14 +15,7 @@ type UIData = {
 function Star({ value }: { value: number }) {
   return (
     <span className="caption-1 text-[var(--color-magenta-300)]">
-      <Image
-        src="/search/littleStar.svg"
-        alt="star"
-        width={9}
-        height={10}
-        className="inline-block mb-0.5"
-        priority
-      />{' '}
+      <img src="/search/littleStar.svg" alt="star" width="9" height="10" className="inline-block mb-0.5" loading="lazy" />{' '}
       {Number.isFinite(value) ? value.toFixed(1) : '0.0'}
     </span>
   )

@@ -39,7 +39,7 @@ export default function LibraryWorksListContent({
 
   return (
     <div>
-      {works.map((w) => (
+      {works.map((w, idx) => (
         <button
           key={w.id}
           type="button"
@@ -53,6 +53,10 @@ export default function LibraryWorksListContent({
                 src={w.thumb}
                 alt={w.title}
                 fill
+                sizes="87px"
+                priority={idx < 2}
+                loading={idx < 2 ? 'eager' : 'lazy'}
+                decoding="async"
                 className="object-cover"
               />
             ) : null}
@@ -65,14 +69,7 @@ export default function LibraryWorksListContent({
 
             <div className="flex items-center gap-2">
               <span className="caption-1 font-extrabold text-pink-500">
-                <Image
-                  src="/search/littleStar.svg"
-                  alt="star icon"
-                  width={9}
-                  height={10}
-                  className="inline-block mr-1 mb-0.5"
-                  priority
-                />
+                <img src="/search/littleStar.svg" alt="star icon" width="9" height="10" className="inline-block mr-1 mb-0.5" loading="lazy" />
                 {Number(w.rating ?? 0).toFixed(1)}
               </span>
             </div>

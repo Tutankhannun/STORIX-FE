@@ -1,7 +1,6 @@
 //src/components/library/works/WorkTopBar.tsx
 'use client'
 
-import Image from 'next/image'
 
 type Props = {
   onBack: () => void
@@ -18,7 +17,7 @@ export default function WorkTopBar({ onBack, isLiked, onToggleLike }: Props) {
         className="flex h-8 w-8 items-center justify-center cursor-pointer"
         aria-label="뒤로가기"
       >
-        <Image src="/icons/back.svg" alt="back" width={24} height={24} />
+        <img src="/icons/back.svg" alt="back" width="24" height="24" loading="lazy" />
       </button>
 
       <button
@@ -27,16 +26,7 @@ export default function WorkTopBar({ onBack, isLiked, onToggleLike }: Props) {
         className="flex items-center gap-1 cursor-pointer"
         aria-label="관심"
       >
-        <Image
-          src={
-            isLiked
-              ? '/icons/icon-add-active.svg'
-              : '/icons/icon-add-deactive.svg'
-          }
-          alt="like"
-          width={20}
-          height={20}
-        />
+        <img src={isLiked ? "/icons/icon-add-active.svg" : "/icons/icon-add-deactive.svg"} alt="like" width="20" height="20" loading="lazy" />
         {isLiked ? (
           <span className="body-2 text-black">관심중</span>
         ) : (

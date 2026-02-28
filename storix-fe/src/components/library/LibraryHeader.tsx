@@ -1,7 +1,6 @@
 // src/components/library/LibraryHeader.tsx
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 
 /** 상단 페이지+ 검색 */
@@ -21,13 +20,7 @@ export default function LibraryHeader() {
           aria-label="검색"
           className="flex h-6 w-6 items-center justify-center"
         >
-          <Image
-            src={'/common/icons/search.svg'}
-            alt={'검색'}
-            width={24}
-            height={24}
-            className="inline-block"
-          />
+          <img src="/common/icons/search.svg" alt="??" width="24" height="24" className="inline-block" loading="lazy" />
         </Link>
       </div>
     </header>
